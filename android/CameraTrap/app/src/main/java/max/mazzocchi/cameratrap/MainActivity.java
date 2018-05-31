@@ -1,11 +1,13 @@
 package max.mazzocchi.cameratrap;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.params.StreamConfigurationMap;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -44,14 +46,58 @@ public class MainActivity extends AppCompatActivity {
             Log.i(TAG, "Available!");
             openCamera(preview_view.getWidth(), preview_view.getHeight());
         } else {
-            preview_view.setSurfaceTextureListener(new PreviewTextureListener());
+            preview_view.setSurfaceTextureListener(
+                    new PreviewTextureListener());
+        }
+    }
+
+    private CameraCharacteristics getCameraCharacteristics(
+            CameraManager manager) throws CannotAccessCameraException {
+        try {
+            CameraCharacteristics out = null;
+
+            for (String camera_id : manager.getCameraIdList()) {
+                CameraCharacteristics characteristics =
+                        manager.getCameraCharacteristics(camera_id);
+                Integer facing = characteristics.get(
+                        CameraCharacteristics.LENS_FACING);
+                if((facing == null) ||
+                        (facing == CameraCharacteristics.LENS_FACING_FRONT)) {
+                    StreamConfigurationMap map = characteristics.get(
+                            CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+                    if(map != null) {
+                        out = characteristics;
+                        break;
+                    }
+                }
+            }
+
+            if(out != null) {
+                return out;
+
+            } else {
+                throw new CannotAccessCameraException(
+                        "No suitable camera could be found.");
+            }
+        } catch(NullPointerException npe) {
+            throw new CannotAccessCameraException(npe);
+        } catch(CameraAccessException cae) {
+            throw new CannotAccessCameraException(cae);
         }
     }
 
     private void openCamera(int width, int height) {
         if(permissionsGranted()) {
             Log.i(TAG, "We have permissions.");
-            CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            CameraManager manager =
+                    (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
+            try {
+                CameraCharacteristics characteristics = getCameraCharacteristics(manager);
+
+            } catch(CannotAccessCameraException cace) {
+                Log.e(TAG, "Could not access camera: {0}", cace);
+            }
 
         } else {
             // TODO: Display some sort of message
@@ -60,13 +106,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean permissionsGranted() {
-        return (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) ==
+        return (ContextCompat.checkSelfPermission(
+                getApplicationContext(), Manifest.permission.CAMERA) ==
                 PackageManager.PERMISSION_GRANTED);
     }
 
-    private class PreviewTextureListener implements TextureView.SurfaceTextureListener {
+    private class PreviewTextureListener
+            implements TextureView.SurfaceTextureListener {
         @Override
-        public void onSurfaceTextureAvailable(SurfaceTexture texture, int width, int height) {
+        public void onSurfaceTextureAvailable(SurfaceTexture texture,
+                                              int width, int height) {
             Log.i(TAG, "Texture available");
             Log.i(TAG, "Width: "+width);
             Log.i(TAG, "Height: "+height);
@@ -74,7 +123,8 @@ public class MainActivity extends AppCompatActivity {
             openCamera(width, height);
         }
         @Override
-        public void onSurfaceTextureSizeChanged(SurfaceTexture texture, int width, int height) {
+        public void onSurfaceTextureSizeChanged(SurfaceTexture texture,
+                                                int width, int height) {
             Log.i(TAG, "Texture changed");
             Log.i(TAG, "Width: "+width);
             Log.i(TAG, "Height: "+height);
@@ -89,6 +139,16 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onSurfaceTextureUpdated(SurfaceTexture texture) {
             Log.i(TAG, "Texture updated");
+        }
+    }
+
+    private class CannotAccessCameraException extends Exception {
+        public CannotAccessCameraException(Throwable e) {
+            super(e);
+        }
+
+        public CannotAccessCameraException(String reason) {
+            super(reason);
         }
     }
 }
