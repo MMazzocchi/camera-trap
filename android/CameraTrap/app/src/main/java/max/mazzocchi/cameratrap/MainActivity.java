@@ -1,8 +1,11 @@
 package max.mazzocchi.cameratrap;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
+import android.hardware.camera2.CameraManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -48,7 +51,10 @@ public class MainActivity extends AppCompatActivity {
     private void openCamera(int width, int height) {
         if(permissionsGranted()) {
             Log.i(TAG, "We have permissions.");
+            CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+
         } else {
+            // TODO: Display some sort of message
             Log.i(TAG, "We don't have permissions.");
         }
     }
