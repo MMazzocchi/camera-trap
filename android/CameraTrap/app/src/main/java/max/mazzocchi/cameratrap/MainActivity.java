@@ -137,8 +137,9 @@ public class MainActivity extends AppCompatActivity {
                 reader.setOnImageAvailableListener(new ImageAvailableListener(),
                         image_handler);
 
-            } catch(CannotAccessCameraException cace) {
-                Log.e(TAG, "Could not access camera: {0}", cace);
+            } catch(CannotAccessCameraException |
+                    NullPointerException e) {
+                Log.e(TAG, "Could not access camera: {0}", e);
             }
 
         } else {
