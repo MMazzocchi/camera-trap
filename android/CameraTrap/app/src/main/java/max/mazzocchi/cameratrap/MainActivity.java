@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Size;
+import android.view.Surface;
 import android.view.TextureView;
 
 import java.util.Arrays;
@@ -124,7 +125,8 @@ public class MainActivity extends AppCompatActivity {
                     (CameraManager) getSystemService(Context.CAMERA_SERVICE);
 
             try {
-                CameraCharacteristics characteristics = getCameraCharacteristics(manager);
+                CameraCharacteristics characteristics =
+                        getCameraCharacteristics(manager);
                 StreamConfigurationMap map = characteristics.get(
                         CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 Size largest = Collections.max(
@@ -136,6 +138,33 @@ public class MainActivity extends AppCompatActivity {
                         2);
                 reader.setOnImageAvailableListener(new ImageAvailableListener(),
                         image_handler);
+                int display_rotation = this.getWindowManager()
+                        .getDefaultDisplay()
+                        .getRotation();
+                int sensor_orientation = characteristics.get(
+                        CameraCharacteristics.SENSOR_ORIENTATION);
+                boolean swapped_dims = false;
+                switch(display_rotation) {
+                    case Surface.ROTATION_0:
+                    case Surface.ROTATION_180:
+                        if(sensor_orientation == 90 ||
+                                sensor_orientation == 270) {
+                            swapped_dims = true;
+                        }
+                        break;
+
+                    case Surface.ROTATION_90:
+                    case Surface.ROTATION_270:
+                        if(sensor_orientation == 0 ||
+                                sensor_orientation == 180) {
+                            swapped_dims = true;
+                        }
+                        break;
+
+                    default:
+                        Log.w(TAG, "Display rotation is invalid: "+
+                                display_rotation);
+                }
 
             } catch(CannotAccessCameraException |
                     NullPointerException e) {
