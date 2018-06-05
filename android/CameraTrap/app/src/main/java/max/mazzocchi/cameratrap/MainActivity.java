@@ -3,7 +3,9 @@ package max.mazzocchi.cameratrap;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.ImageFormat;
+import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
@@ -21,15 +23,17 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
   private static final String TAG = "CameraTrap";
 
-  private TextureView preview_view;
+  private AutoFitTextureView preview_view;
   private HandlerThread image_handler_thread;
   private Handler image_handler;
 
@@ -118,6 +122,41 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
+  private Size chooseOptimalSize(Size[] choices, int texture_view_width,
+    int texture_view_height, int max_width, int max_height, Size aspect_ratio) {
+    List<Size> big_enough = new ArrayList<>();
+    List<Size> not_big_enough = new ArrayList<>();
+
+    int w = aspect_ratio.getWidth();
+    int h = aspect_ratio.getHeight();
+
+    for(Size option : choices) {
+      if((option.getWidth() <= max_width) &&
+         (option.getHeight() <= max_height) &&
+         (option.getHeight() == option.getWidth() * h / w)) {
+
+        if((option.getWidth() >= texture_view_width) &&
+           (option.getHeight() >= texture_view_height)) {
+          big_enough.add(option);
+
+        } else {
+          not_big_enough.add(option);
+        }
+      }
+    }
+
+    if(big_enough.size() > 0) {
+      return Collections.min(big_enough, new SizeComparator());
+
+    } else if(not_big_enough.size() > 0) {
+      return Collections.max(not_big_enough, new SizeComparator());
+
+    } else {
+      Log.w(TAG, "Could not find a suitable size");
+      return choices[0];
+    }
+  }
+
   private void openCamera(int width, int height) {
     if(permissionsGranted()) {
       Log.i(TAG, "We have permissions.");
@@ -131,46 +170,52 @@ public class MainActivity extends AppCompatActivity {
         StreamConfigurationMap map = characteristics.get(
           CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 
-        Size largest = Collections.max(
-          Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
-          new SizeComparator());
+        if(map != null) {
+          Size largest = Collections.max(
+            Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
+            new SizeComparator());
 
-        ImageReader reader = ImageReader.newInstance(
-          largest.getWidth(), largest.getHeight(),
-          ImageFormat.JPEG,
-          2);
+          ImageReader reader = ImageReader.newInstance(
+            largest.getWidth(), largest.getHeight(),
+            ImageFormat.JPEG,
+            2);
 
-        reader.setOnImageAvailableListener(new ImageAvailableListener(),
-          image_handler);
+          reader.setOnImageAvailableListener(new ImageAvailableListener(),
+            image_handler);
 
-        int display_rotation = this.getWindowManager().getDefaultDisplay()
-          .getRotation();
+          boolean dimensions_swapped = areDimensionsSwapped(characteristics);
 
-        int sensor_orientation = characteristics.get(
-            CameraCharacteristics.SENSOR_ORIENTATION);
+          Point display_size = new Point();
+          this.getWindowManager().getDefaultDisplay().getSize(display_size);
 
-        boolean swapped_dims = false;
+          int rotated_prev_width = width;
+          int rotated_prev_height = height;
+          int max_prev_width = display_size.x;
+          int max_prev_height = display_size.y;
 
-        switch(display_rotation) {
-          case Surface.ROTATION_0:
-          case Surface.ROTATION_180:
-            if(sensor_orientation == 90 || sensor_orientation == 270) {
-              swapped_dims = true;
-            }
-            break;
+          if(dimensions_swapped) {
+            rotated_prev_width = height;
+            rotated_prev_height = width;
+            max_prev_width = display_size.y;
+            max_prev_height = display_size.x;
+          }
 
-          case Surface.ROTATION_90:
-          case Surface.ROTATION_270:
-            if(sensor_orientation == 0 || sensor_orientation == 180) {
-              swapped_dims = true;
-            }
-            break;
+          Size preview_size = chooseOptimalSize(
+            map.getOutputSizes(SurfaceTexture.class),
+            rotated_prev_width, rotated_prev_height,
+            max_prev_width, max_prev_height,
+            largest);
 
-          default:
-            Log.w(TAG, "Display rotation is invalid: "+display_rotation);
+          int orientation = getResources().getConfiguration().orientation;
+          if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            preview_view.setAspectRatio(preview_size.getWidth(), preview_size.getHeight());
+          }
+
+        } else {
+            throw new CannotAccessCameraException(
+              "Scalar stream configuration map was null.");
         }
-
-      } catch(CannotAccessCameraException | NullPointerException e) {
+      } catch(CannotAccessCameraException e) {
         Log.e(TAG, "Could not access camera: {0}", e);
       }
 
@@ -178,6 +223,41 @@ public class MainActivity extends AppCompatActivity {
       // TODO: Display some sort of message
       Log.i(TAG, "We don't have permissions.");
     }
+  }
+
+  private boolean areDimensionsSwapped(CameraCharacteristics characteristics) {
+    boolean swapped_dims = false;
+
+    int display_rotation = this.getWindowManager().getDefaultDisplay()
+      .getRotation();
+
+     Integer sensor_orientation = characteristics.get(
+      CameraCharacteristics.SENSOR_ORIENTATION);
+     if(sensor_orientation != null) {
+
+      switch(display_rotation) {
+        case Surface.ROTATION_0:
+        case Surface.ROTATION_180:
+          if(sensor_orientation == 90 || sensor_orientation == 270) {
+            swapped_dims = true;
+          }
+          break;
+
+        case Surface.ROTATION_90:
+        case Surface.ROTATION_270:
+          if(sensor_orientation == 0 || sensor_orientation == 180) {
+            swapped_dims = true;
+          }
+          break;
+
+        default:
+          Log.w(TAG, "Display rotation is invalid: "+display_rotation);
+      }
+    } else {
+      Log.w(TAG, "Could not determine swapped dimensions");
+    }
+
+    return swapped_dims;
   }
 
   private boolean permissionsGranted() {
@@ -216,11 +296,11 @@ public class MainActivity extends AppCompatActivity {
   }
 
   private static class CannotAccessCameraException extends Exception {
-    public CannotAccessCameraException(Throwable e) {
+    private CannotAccessCameraException(Throwable e) {
       super(e);
     }
 
-    public CannotAccessCameraException(String reason) {
+    private CannotAccessCameraException(String reason) {
       super(reason);
     }
   }
