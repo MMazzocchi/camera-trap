@@ -9,5 +9,5 @@ const HOST = "0.0.0.0";
 app.use("/", express.static(join(__dirname, "client")));
 
 http.listen(PORT, HOST, function() {
-  console.log("Listening on "+HOST+": "+PORT);
+  console.log("Listening on "+HOST+":"+PORT);
 });
