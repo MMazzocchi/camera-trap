@@ -5,3 +5,14 @@ html, body, #preview {
   margin: 0px;
   overflow: hidden;
 }
+
+#preview {
+  background: black;
+}
+
+#sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+}
