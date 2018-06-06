@@ -10,6 +10,8 @@
   "scripts": {},
   "author": "Max Mazzocchi <maxwell.mazzocchi@gmail.com>",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "express": "^4.16.3"
+  },
   "devDependencies": {}
 }
