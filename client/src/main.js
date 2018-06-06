@@ -1,19 +1,11 @@
-async function setupCamera(vid) {
-  try {
-    var stream = await navigator.mediaDevices.getUserMedia({ video: true });
-    vid.src = window.URL.createObjectURL(stream);
-    vid.play();
+var Video = require("./Video.js");
 
-  } catch(e) {
-    console.error("Could not open stream", e);
-  }
-};
+var preview_el = document.getElementById("preview");
 
-var video = document.getElementById("preview");
-
-if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-  setupCamera(video);
-
-} else {
-  console.error("Media devices could not be accessed.");
-}
+Video()
+.then(function(video) {;
+  video.bind(preview_el);
+})
+.catch(function(e) {
+  console.error("Could not instantiate video", e);
+});
