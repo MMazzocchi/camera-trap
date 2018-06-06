@@ -7,7 +7,10 @@
     "url": "https://github.com/MMazzocchi/camera-trap"
   },
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "prepare": "gulp",
+    "build": "gulp build"
+  },
   "author": "Max Mazzocchi <maxwell.mazzocchi@gmail.com>",
   "license": "MIT",
   "dependencies": {
