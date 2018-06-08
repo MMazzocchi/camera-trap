@@ -2,7 +2,7 @@ var Socket = function() {
   return new Promise(function(resolve, reject) {
     try {
       var url = window.location;
-      var socket = new WebSocket("ws://"+url.host+"/input");
+      var socket = new WebSocket("ws://"+url.host);
 
       socket.onopen = function() {
         resolve(socket);
