@@ -42,6 +42,11 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
       timer.start();
     }
   };
+
+  // Show error on disconnect
+  socket.onclose = function() {
+    addError("Connection to server was closed.");
+  };
 })
 .catch(function(e) {
   addError("An error occured: "+e.message);
