@@ -1,5 +1,6 @@
 var Video = require("./Video.js");
 var Timer = require("./Timer.js");
+var fullscreen = require("./fullscreen.js");
 
 const INTERVAL = 1000;
 
@@ -34,3 +35,6 @@ Video(preview_el)
 .catch(function(e) {
   console.error("Could not instantiate video", e);
 });
+
+var body = document.getElementsByTagName("body")[0];
+fullscreen(body);
