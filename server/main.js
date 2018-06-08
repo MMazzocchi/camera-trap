@@ -5,6 +5,8 @@ var http = require("http").Server(app);
 var WebSocket = require("ws");
 var ImageComparer = require("./ImageComparer.js");
 
+var debug = require("debug")("camera-trap");
+
 const PORT = 9221;
 const HOST = "0.0.0.0";
 
@@ -15,6 +17,7 @@ var wss = new WebSocket.Server({
 
 wss.on("connection", function(socket) {
   var comparer = new ImageComparer();
+  debug("Received a new connection.");
 
   socket.on("message", function(img) {
     comparer.handle(img);
@@ -22,5 +25,5 @@ wss.on("connection", function(socket) {
 });
 
 http.listen(PORT, HOST, function() {
-  console.log("Listening on "+HOST+":"+PORT);
+  debug("Listening on "+HOST+":"+PORT);
 });
