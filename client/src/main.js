@@ -5,22 +5,20 @@ var fullscreen = require("./fullscreen.js");
 
 const INTERVAL = 1000;
 
+// Setup error display
 var error_box = document.getElementById("error-box");
-
 function addError(text) {
   error_box.innerHTML += `<p>${text}</p>`;
 };
 
-Socket().then(function(socket) {
-  console.log("Connected!!");
-})
-.catch(function(e) {
-  addError("Could not establish connection to server: "+e.message);
-});
+// Allow for fullscreen
+var body = document.getElementsByTagName("body")[0];
+fullscreen(body);
 
 var preview_el = document.getElementById("preview");
-Video(preview_el)
-.then(function(video) {
+Promise.all([Socket(), Video(preview_el)]).then(function(values) {
+  var socket = values[0];
+  var video = values[1];
 
   // Setup a timer to take snaps every INTERVAL milliseconds
   var timer = new Timer(INTERVAL,
@@ -46,8 +44,5 @@ Video(preview_el)
   };
 })
 .catch(function(e) {
-  addError("Could not instantiate video: "+e.message);
+  addError("An error occured: "+e.message);
 });
-
-var body = document.getElementsByTagName("body")[0];
-fullscreen(body);
