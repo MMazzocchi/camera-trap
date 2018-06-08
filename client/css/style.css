@@ -16,3 +16,11 @@ html, body, #preview {
   right: 0;
   height: 100%;
 }
+
+svg > * {
+  cursor: default;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
