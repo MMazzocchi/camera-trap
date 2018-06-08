@@ -14,7 +14,9 @@ var wss = new WebSocket.Server({
 });
 
 wss.on("connection", function(socket) {
-  console.log("Got a connection!!!");
+  socket.on("message", function(msg) {
+    console.log("Got a message: "+msg);
+  });
 });
 
 http.listen(PORT, HOST, function() {
