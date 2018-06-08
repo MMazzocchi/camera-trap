@@ -1,16 +1,24 @@
 var Video = require("./Video.js");
+var Socket = require("./Socket.js");
 var Timer = require("./Timer.js");
 var fullscreen = require("./fullscreen.js");
 
 const INTERVAL = 1000;
 
 var error_box = document.getElementById("error-box");
-var preview_el = document.getElementById("preview");
 
 function addError(text) {
   error_box.innerHTML += `<p>${text}</p>`;
 };
 
+Socket().then(function(socket) {
+  console.log("Connected!!");
+})
+.catch(function(e) {
+  addError("Could not establish connection to server: "+e.message);
+});
+
+var preview_el = document.getElementById("preview");
 Video(preview_el)
 .then(function(video) {
 
