@@ -15,6 +15,7 @@ var wss = new WebSocket.Server({
 
 wss.on("connection", function(socket) {
   socket.on("message", function(msg) {
+    console.log(typeof(msg));
     console.log("Got a message: "+msg);
   });
 });

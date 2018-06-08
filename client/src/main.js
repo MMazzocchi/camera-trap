@@ -24,7 +24,7 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
   var timer = new Timer(INTERVAL,
     function() {
       var img = video.snap();
-      socket.send(img);
+      socket.send(JSON.stringify(img));
     });
 
   // Start and stop the timer based on the button

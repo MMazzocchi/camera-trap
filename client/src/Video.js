@@ -25,7 +25,9 @@ Video = async function(video_el) {
   // Public methods
   that.snap = function() {
     ctx.drawImage(video_el, 0, 0, canvas.width, canvas.height);
-    return ctx.getImageData(0, 0, canvas.width, canvas.height);
+    var url = canvas.toDataURL("image/jpg");
+    var base64 = url.replace(/^data:image\/jpg;base64,/, "")
+    return url;
   };
 
   return that;
