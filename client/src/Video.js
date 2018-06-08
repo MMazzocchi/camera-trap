@@ -13,14 +13,19 @@ Video = async function(video_el) {
 
   // Setup the canvas
   var canvas = document.createElement("canvas");
-  canvas.width = video_el.offsetWidth;
-  canvas.height = video_el.offsetHeight;
   var ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = video_el.offsetWidth;
+    canvas.height = video_el.offsetHeight;
+  };
+  resize();
+  window.addEventListener("resize", resize); 
 
   // Public methods
   that.snap = function() {
     ctx.drawImage(video_el, 0, 0, canvas.width, canvas.height);
-    return ctx.getImageData(0, 0, canvas.width, canvas.width);
+    return ctx.getImageData(0, 0, canvas.width, canvas.height);
   };
 
   return that;
