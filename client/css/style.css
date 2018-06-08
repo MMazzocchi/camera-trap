@@ -10,6 +10,17 @@ html, body, #preview {
   background: black;
 }
 
+#error-box {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: red;
+  opacity: 0.75;
+  color: white;
+  text-align: center;
+}
+
 #sidebar {
   position: fixed;
   top: 0;

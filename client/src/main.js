@@ -4,7 +4,12 @@ var fullscreen = require("./fullscreen.js");
 
 const INTERVAL = 1000;
 
+var error_box = document.getElementById("error-box");
 var preview_el = document.getElementById("preview");
+
+function addError(text) {
+  error_box.innerHTML += `<p>${text}</p>`;
+};
 
 Video(preview_el)
 .then(function(video) {
@@ -33,7 +38,7 @@ Video(preview_el)
   };
 })
 .catch(function(e) {
-  console.error("Could not instantiate video", e);
+  addError("Could not instantiate video: "+e.message);
 });
 
 var body = document.getElementsByTagName("body")[0];
