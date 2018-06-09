@@ -2,6 +2,7 @@ var Video = require("./Video.js");
 var Socket = require("./Socket.js");
 var Timer = require("./Timer.js");
 var fullscreen = require("./fullscreen.js");
+var NoSleep = require("../lib/NoSleep.min.js");
 
 const INTERVAL = 1000;
 
@@ -14,6 +15,8 @@ function addError(text) {
 // Allow for fullscreen
 var body = document.getElementsByTagName("body")[0];
 fullscreen(body);
+
+var nosleep = new NoSleep();
 
 var preview_el = document.getElementById("preview");
 Promise.all([Socket(), Video(preview_el)]).then(function(values) {
@@ -36,10 +39,12 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
     if(timer.running()) {
       inner.setAttribute("fill", "grey");
       timer.stop();
+      nosleep.disable();
 
     } else {
       inner.setAttribute("fill", "red");
       timer.start();
+      nosleep.enable();
     }
   };
 
