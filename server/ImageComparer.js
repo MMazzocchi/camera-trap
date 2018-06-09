@@ -43,13 +43,19 @@ var ImageComparer = function() {
 
     if(base_hist === undefined) {
       base_hist = hist;
-
-    } else {
-      var metric = base_hist.compareHist(hist, 0);
-      console.log(metric);
     }
 
+    var metric0 = base_hist.compareHist(hist, 0);
+    var metric1 = base_hist.compareHist(hist, 1);
+    var metric2 = base_hist.compareHist(hist, 2);
+    var metric3 = base_hist.compareHist(hist, 3);
+    base_hist = hist;
     debug("Completed image processing.");
+
+    return ((metric0 < 0.9995) ||
+            (metric1 > 44000) ||
+            (metric2 < 20600) ||
+            (metric3 > 0.15));
   };
 
   return that;

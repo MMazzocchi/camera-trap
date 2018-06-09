@@ -20,7 +20,11 @@ wss.on("connection", function(socket) {
   debug("Received a new connection.");
 
   socket.on("message", function(img) {
-    comparer.handle(img);
+    var different = comparer.handle(img);
+
+    if(different) {
+      console.log("Got one!");
+    }
   });
 });
 
