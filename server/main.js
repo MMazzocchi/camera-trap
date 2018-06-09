@@ -1,3 +1,4 @@
+var fs = require("fs");
 var join = require("path").join;
 var express = require("express");
 var app = express();
@@ -23,7 +24,14 @@ wss.on("connection", function(socket) {
     var different = comparer.handle(img);
 
     if(different) {
-      console.log("Got one!");
+      var filename = join(__dirname, "..", "..", "pics", Date.now()+".jpg");
+      debug("Writing "+filename);
+
+      var buffer = Buffer.from(img, "base64");
+      fs.writeFile(filename, buffer,
+        function(err) {
+          debug("Could not write file: "+err);
+        });
     }
   });
 });
