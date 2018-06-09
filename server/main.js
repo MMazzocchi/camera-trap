@@ -30,7 +30,9 @@ wss.on("connection", function(socket) {
       var buffer = Buffer.from(img, "base64");
       fs.writeFile(filename, buffer,
         function(err) {
-          debug("Could not write file: "+err);
+          if(err) {
+            debug("Could not write file: "+err);
+          }
         });
     }
   });
