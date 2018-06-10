@@ -10,6 +10,7 @@ var debug = require("debug")("camera-trap");
 
 const PORT = 9221;
 const HOST = "0.0.0.0";
+const PING_INTERVAL = 30000;
 
 app.use("/", express.static(join(__dirname, "../client")));
 var wss = new WebSocket.Server({
@@ -17,8 +18,14 @@ var wss = new WebSocket.Server({
 });
 
 wss.on("connection", function(socket) {
-  var comparer = new ImageComparer();
   debug("Received a new connection.");
+
+  socket.alive = true;
+  socket.on("pong", function() {
+    socket.alive = true;
+  });
+
+  var comparer = new ImageComparer();
 
   socket.on("message", function(img) {
     var different = comparer.handle(img);
@@ -37,6 +44,19 @@ wss.on("connection", function(socket) {
     }
   });
 });
+
+var ping_interval = setInterval(function() {
+  wss.clients.forEach(function(socket) {
+    if(socket.alive === false) {
+      debug("Cleaning up a dead socket.");
+      socket.terminate();
+
+    } else {
+      socket.alive = false;
+      socket.ping();
+    }
+  });
+}, PING_INTERVAL);
 
 http.listen(PORT, HOST, function() {
   debug("Listening on "+HOST+":"+PORT);
