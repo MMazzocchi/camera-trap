@@ -23,7 +23,8 @@ function newId() {
   return new_id;
 };
 
-var ImageComparer = function() {
+var ImageComparer = function(threshold0, threshold1,
+                             threshold2, threshold3) {
   var that = {};
 
   // Fields
@@ -52,15 +53,15 @@ var ImageComparer = function() {
     base_hist = hist;
     debug("Completed image processing.");
 
-    if (metric0 < 0.998)  { console.log("metric0: "+metric0); }
-    if (metric1 > 44000)  { console.log("metric1: "+metric1); }
-    if (metric2 < 2)      { console.log("metric2: "+metric2); }
-    if (metric3 > 0.15)   { console.log("metric3: "+metric3); }
+    if (metric0 < threshold0) { console.log("metric0: "+metric0); }
+    if (metric1 > threshold1) { console.log("metric1: "+metric1); }
+    if (metric2 < threshold2) { console.log("metric2: "+metric2); }
+    if (metric3 > threshold3) { console.log("metric3: "+metric3); }
 
-    return ((metric0 < 0.998) ||
-            (metric1 > 44000) ||
-            (metric2 < 2)     ||
-            (metric3 > 0.15));
+    return ((metric0 < threshold0) ||
+            (metric1 > threshold1) ||
+            (metric2 < threshold2) ||
+            (metric3 > threshold3));
   };
 
   return that;
