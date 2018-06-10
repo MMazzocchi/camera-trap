@@ -9,7 +9,11 @@ const INTERVAL = 1000;
 // Setup status display
 var status_box = document.getElementById("status-box");
 function setStatus(text) {
-  status_box.innerHTML = `<p>${text}</p>`;
+  if(text.length > 0) {
+    status_box.innerHTML = `<p>${text}</p>`;
+  } else {
+    status_box.innerHTML = "";
+  }
 };
 
 // Allow for fullscreen
