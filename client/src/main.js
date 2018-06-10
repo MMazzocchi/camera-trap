@@ -52,6 +52,10 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
   socket.onclose = function() {
     addError("Connection to server was closed.");
   };
+
+  socket.onerror = function(e) {
+    addError("Connection to server errored: "+e);
+  };
 })
 .catch(function(e) {
   addError("An error occured: "+e.message);
