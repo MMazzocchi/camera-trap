@@ -6,10 +6,10 @@ var NoSleep = require("../lib/NoSleep.min.js");
 
 const INTERVAL = 1000;
 
-// Setup error display
-var error_box = document.getElementById("error-box");
-function addError(text) {
-  error_box.innerHTML += `<p>${text}</p>`;
+// Setup status display
+var status_box = document.getElementById("status-box");
+function setStatus(text) {
+  status_box.innerHTML = `<p>${text}</p>`;
 };
 
 // Allow for fullscreen
@@ -50,13 +50,13 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
 
   // Show error on disconnect
   socket.onclose = function() {
-    addError("Connection to server was closed.");
+    setStatus("Connection to server was closed.");
   };
 
   socket.onerror = function(e) {
-    addError("Connection to server errored: "+e);
+    setStatus("Connection to server errored: "+e);
   };
 })
 .catch(function(e) {
-  addError("An error occured: "+e.message);
+  setStatus("An error occured: "+e.message);
 });
