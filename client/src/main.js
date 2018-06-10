@@ -5,6 +5,7 @@ var fullscreen = require("./fullscreen.js");
 var NoSleep = require("../lib/NoSleep.min.js");
 
 const INTERVAL = 1000;
+const PING_INTERVAL = 30000;
 
 // Setup status display
 var status_box = document.getElementById("status-box");
@@ -65,6 +66,32 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
   socket.onerror = function(e) {
     setStatus("Connection to server errored: "+e);
   };
+
+  // Setup ping
+  socket.alive = true;
+  socket.addEventListener("message", function(msg) {
+    socket.alive = true;
+  });
+
+  var ping_interval = setInterval(function() {
+    if(socket.alive === false) {
+      setStatus("Lost connection to server. Attempting to reconnect...");
+      Socket().then(function(new_socket) {
+        new_socket.alive = true;
+        socket = new_socket;
+        setStatus("");
+      })
+      .catch(function(e) {
+        setStatus("Reconnect failed: "+e);
+        clearInterval(ping_interval);
+      });
+
+    } else {
+      socket.alive = false;
+      var msg = { "type": "ping" };
+      socket.send(JSON.stringify(msg));
+    }
+  }, PING_INTERVAL);
 })
 .catch(function(e) {
   setStatus("An error occured: "+e.message);
