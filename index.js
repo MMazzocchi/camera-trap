@@ -1,4 +1,7 @@
-var config = {
+const config = {
+  "host": "0.0.0.0",
+  "port": 9221,
+
   "threshold0": 0.998,
   "threshold1": 44000,
   "threshold2": 2,

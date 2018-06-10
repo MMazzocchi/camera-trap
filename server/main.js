@@ -8,8 +8,6 @@ var ImageComparer = require("./ImageComparer.js");
 
 var debug = require("debug")("camera-trap");
 
-const PORT = 9221;
-const HOST = "0.0.0.0";
 const PING_INTERVAL = 30000;
 
 var main = function(config) {
@@ -60,8 +58,8 @@ var main = function(config) {
     });
   }, PING_INTERVAL);
   
-  http.listen(PORT, HOST, function() {
-    debug("Listening on "+HOST+":"+PORT);
+  http.listen(config.port, config.host, function() {
+    debug("Listening on "+config.host+":"+config.port);
   });
 };
 
