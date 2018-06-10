@@ -26,8 +26,8 @@ var main = function(config) {
   
     var comparer = new ImageComparer(config.threshold0, config.threshold1,
                                      config.threshold2, config.threshold3);
-  
-    socket.on("message", function(img) {
+ 
+    function handleImage(img){
       var different = comparer.handle(img);
   
       if(different) {
@@ -41,6 +41,20 @@ var main = function(config) {
               debug("Could not write file: "+err);
             }
           });
+      }
+    };
+ 
+    socket.on("message", function(json) {
+      var msg = JSON.parse(json);
+
+      if(msg.type === "image") {
+        handleImage(msg.data);
+
+      } else if(msg.type === "ping") {
+        socket.send("pong");
+
+      } else {
+        debug("Received an unknown message type: "+msg.type);
       }
     });
   });
