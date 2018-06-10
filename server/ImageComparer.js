@@ -52,9 +52,14 @@ var ImageComparer = function() {
     base_hist = hist;
     debug("Completed image processing.");
 
-    return ((metric0 < 0.9995) ||
+    if (metric0 < 0.998)  { console.log("metric0: "+metric0); }
+    if (metric1 > 44000)  { console.log("metric1: "+metric1); }
+    if (metric2 < 2)      { console.log("metric2: "+metric2); }
+    if (metric3 > 0.15)   { console.log("metric3: "+metric3); }
+
+    return ((metric0 < 0.998) ||
             (metric1 > 44000) ||
-            (metric2 < 20600) ||
+            (metric2 < 2)     ||
             (metric3 > 0.15));
   };
 
