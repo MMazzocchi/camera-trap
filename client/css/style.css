@@ -10,7 +10,7 @@ html, body, #preview {
   background: black;
 }
 
-#error-box {
+#status-box {
   position: fixed;
   top: 0;
   left: 0;
