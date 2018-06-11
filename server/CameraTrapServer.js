@@ -4,6 +4,7 @@ var express = require("express");
 var app = express();
 var http = require("http").Server(app);
 var WebSocket = require("ws");
+var cluster = require("cluster");
 var ImageComparer = require("./ImageComparer.js");
 
 var debug = require("debug")("camera-trap");
@@ -11,6 +12,10 @@ var debug = require("debug")("camera-trap");
 const PING_INTERVAL = 30000;
 
 var CameraTrapServer = function(config) {
+  cluster.setupMaster({
+    "exec": join(__dirname, "worker.js")
+  }); 
+
   app.use("/", express.static(join(__dirname, "../client")));
   var wss = new WebSocket.Server({
     server: http
@@ -23,32 +28,15 @@ var CameraTrapServer = function(config) {
     socket.on("pong", function() {
       socket.alive = true;
     });
-  
-    var comparer = new ImageComparer(config.threshold0, config.threshold1,
-                                     config.threshold2, config.threshold3);
- 
-    function handleImage(img){
-      var different = comparer.handle(img);
-  
-      if(different) {
-        var filename = join(__dirname, "..", "..", "pics", Date.now()+".jpg");
-        debug("Writing "+filename);
-  
-        var buffer = Buffer.from(img, "base64");
-        fs.writeFile(filename, buffer,
-          function(err) {
-            if(err) {
-              debug("Could not write file: "+err);
-            }
-          });
-      }
-    };
- 
+
+    var worker = cluster.fork(config);
+    socket.worker = worker;
+
     socket.on("message", function(json) {
       var msg = JSON.parse(json);
 
       if(msg.type === "image") {
-        handleImage(msg.data);
+        socket.worker.send(msg.data);
 
       } else if(msg.type === "ping") {
         socket.send("pong");
@@ -57,6 +45,16 @@ var CameraTrapServer = function(config) {
         debug("Received an unknown message type: "+msg.type);
       }
     });
+
+    socket.on("close", function() {
+      debug("Socket closed.");
+      socket.worker.kill();
+    });
+
+    socket.on("error", function() {
+      debug("Socket errored.");
+      socket.worker.kill();
+    });
   });
   
   var ping_interval = setInterval(function() {
@@ -64,7 +62,8 @@ var CameraTrapServer = function(config) {
       if(socket.alive === false) {
         debug("Cleaning up a dead socket.");
         socket.terminate();
-  
+        socket.worker.kill(); 
+ 
       } else {
         socket.alive = false;
         socket.ping();
