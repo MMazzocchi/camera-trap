@@ -16,8 +16,8 @@ var CameraTrapServer = function(config) {
     server: http
   });
   
-  wss.on("connection", function(socket) {
-    debug("Received a new connection.");
+  wss.on("connection", function(socket, req) {
+    debug("Received a new connection from "+req.connection.remoteAddress);
   
     socket.alive = true;
     socket.on("pong", function() {
