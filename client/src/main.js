@@ -85,7 +85,7 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
         setStatus("");
       })
       .catch(function(e) {
-        setStatus("Reconnect failed: "+e);
+        setStatus("Reconnect failed: "+e.message);
         clearInterval(ping_interval);
       });
 
