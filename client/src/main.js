@@ -78,6 +78,9 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
       setStatus("Lost connection to server. Attempting to reconnect...");
       Socket().then(function(new_socket) {
         new_socket.alive = true;
+        new_socket.addEventListener("message", function(msg) {
+          new_socket.alive = true;
+        });
         socket = new_socket;
         setStatus("");
       })
