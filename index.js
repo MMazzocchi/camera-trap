@@ -1,3 +1,5 @@
+var CameraTrapServer = require("./server/CameraTrapServer.js");
+
 const config = {
   "host": "0.0.0.0",
   "port": 9221,
@@ -8,5 +10,4 @@ const config = {
   "threshold3": 0.15
 };
 
-var main = require("./server/main.js");
-main(config);
+new CameraTrapServer(config);

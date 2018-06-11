@@ -10,7 +10,7 @@ var debug = require("debug")("camera-trap");
 
 const PING_INTERVAL = 30000;
 
-var main = function(config) {
+var CameraTrapServer = function(config) {
   app.use("/", express.static(join(__dirname, "../client")));
   var wss = new WebSocket.Server({
     server: http
@@ -77,4 +77,4 @@ var main = function(config) {
   });
 };
 
-module.exports = main;
+module.exports = CameraTrapServer;
