@@ -82,6 +82,9 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
           new_socket.alive = true;
         });
 
+        socket.onerror = undefined;
+        socket.onclose = undefined;
+
         socket.close();
         socket = new_socket;
         setStatus("");
