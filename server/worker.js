@@ -10,27 +10,44 @@ if(cluster.isWorker) {
   var id = process.pid;
   var comparer = new ImageComparer(process.env.threshold0,
     process.env.threshold1, process.env.threshold2, process.env.threshold3);
- 
+  var queue = [];
+  var dir = join(__dirname, "..", "..", "pics");
+
+  function writeImage(img) {
+    var filename = join(dir, Date.now()+"_"+id+".jpg");
+    debug("Writing "+filename);
+  
+    var buffer = Buffer.from(img, "base64");
+    fs.writeFile(filename, buffer,
+      function(err) {
+        if(err) {
+          debug("Could not write file: "+err);
+        }
+      });
+  };
+
   function handleImage(img){
     var different = comparer.handle(img);
   
     if(different) {
-      var filename = join(__dirname, "..", "..", "pics",
-        Date.now()+"_"+id+".jpg");
-      debug("Writing "+filename);
-  
-      var buffer = Buffer.from(img, "base64");
-      fs.writeFile(filename, buffer,
-        function(err) {
-          if(err) {
-            debug("Could not write file: "+err);
-          }
-        });
+      writeImage(img);
     }
   };
 
-  process.on("message", handleImage);
- 
+  function readQueue() {
+    if(queue.length > 0) {
+      handleImage(queue.shift());
+    }
+
+    setImmediate(readQueue);
+  };
+
+  process.on("message", function(img) {
+    queue.push(img);
+  });
+
+  setImmediate(readQueue);
+
 } else {
   console.log("ERROR: worker.js must be run as a Worker process.");
 }
