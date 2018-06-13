@@ -7,6 +7,7 @@ const INTERVAL = 1000;
 const PING_INTERVAL = 30000;
 const MAX_RETRIES = 3;
 
+// Bind events to a new socket
 function setupSocket(socket) {
   function handleClose() {
     setStatus("Connection to server was closed.");
@@ -33,6 +34,7 @@ function setupSocket(socket) {
   };
 };
 
+// Attach a timer to the button
 function attachButton(timer) {
   var button = document.getElementById("button");
   var inner = document.getElementById("inner-button");
@@ -65,6 +67,7 @@ function setStatus(text) {
 var body = document.getElementsByTagName("body")[0];
 fullscreen(body);
 
+// Setup the preview
 var preview_el = document.getElementById("preview");
 Promise.all([Socket(), Video(preview_el)]).then(function(values) {
   var socket = values[0];
