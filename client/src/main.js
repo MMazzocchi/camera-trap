@@ -7,6 +7,33 @@ const INTERVAL = 1000;
 const PING_INTERVAL = 30000;
 const MAX_RETRIES = 3;
 
+function setupSocket(socket) {
+  function handleClose() {
+    setStatus("Connection to server was closed.");
+    socket.alive = false;
+  };
+  socket.addEventListener("close", handleClose);
+
+  function handleError(e) {
+    setStatus("Connection to server errored: "+e);
+    socket.alive = false;
+  };
+  socket.addEventListener("error", handleError);
+
+  socket.alive = true;
+  function handleMessage(msg) {
+    socket.alive = true;
+    console.log("Pong: "+msg);
+  };
+  socket.addEventListener("message", handleMessage);
+
+  socket.removeListeners = function() {
+    socket.removeEventListener("close", handleClose);
+    socket.removeEventListener("error", handleError);
+    socket.removeEventListener("message", handleMessage);
+  };
+};
+
 function attachButton(timer) {
   var button = document.getElementById("button");
   var inner = document.getElementById("inner-button");
@@ -40,33 +67,6 @@ function setStatus(text) {
 // Allow for fullscreen
 var body = document.getElementsByTagName("body")[0];
 fullscreen(body);
-
-function setupSocket(socket) {
-  function handleClose() {
-    setStatus("Connection to server was closed.");
-    socket.alive = false;
-  };
-  socket.addEventListener("close", handleClose);
-
-  function handleError(e) {
-    setStatus("Connection to server errored: "+e);
-    socket.alive = false;
-  };
-  socket.addEventListener("error", handleError);
-
-  socket.alive = true;
-  function handleMessage(msg) {
-    socket.alive = true;
-    console.log("Pong: "+msg);
-  };
-  socket.addEventListener("message", handleMessage);
-
-  socket.removeListeners = function() {
-    socket.removeEventListener("close", handleClose);
-    socket.removeEventListener("error", handleError);
-    socket.removeEventListener("message", handleMessage);
-  };
-};
 
 var preview_el = document.getElementById("preview");
 Promise.all([Socket(), Video(preview_el)]).then(function(values) {
