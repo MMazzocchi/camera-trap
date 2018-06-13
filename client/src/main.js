@@ -10,6 +10,8 @@ const PING_INTERVAL = 30000;
 // Setup status display
 var status_box = document.getElementById("status-box");
 function setStatus(text) {
+  console.log(text);
+
   if(text.length > 0) {
     status_box.innerHTML = `<p>${text}</p>`;
   } else {
@@ -23,10 +25,37 @@ fullscreen(body);
 
 var nosleep = new NoSleep();
 
+function setupSocket(socket) {
+  function handleClose() {
+    setStatus("Connection to server was closed.");
+  };
+  socket.addEventListener("close", handleClose);
+
+  function handleError(e) {
+    setStatus("Connection to server errored: "+e);
+  };
+  socket.addEventListener("error", handleError);
+
+  socket.alive = true;
+  function handleMessage(msg) {
+    socket.alive = true;
+    console.log("Pong: "+msg);
+  };
+  socket.addEventListener("message", handleMessage);
+
+  socket.removeListeners = function() {
+    socket.removeEventListener("close", handleClose);
+    socket.removeEventListener("error", handleError);
+    socket.removeEventListener("message", handleMessage);
+  };
+};
+
 var preview_el = document.getElementById("preview");
 Promise.all([Socket(), Video(preview_el)]).then(function(values) {
   var socket = values[0];
   var video = values[1];
+
+  setupSocket(socket);
 
   // Setup a timer to take snaps every INTERVAL milliseconds
   var timer = new Timer(INTERVAL,
@@ -58,35 +87,16 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
     }
   };
 
-  // Show error on disconnect
-  socket.onclose = function() {
-    setStatus("Connection to server was closed.");
-  };
-
-  socket.onerror = function(e) {
-    setStatus("Connection to server errored: "+e);
-  };
-
   // Setup ping
-  socket.alive = true;
-  socket.addEventListener("message", function(msg) {
-    socket.alive = true;
-  });
-
   var ping_interval = setInterval(function() {
     if(socket.alive === false) {
       setStatus("Lost connection to server. Attempting to reconnect...");
       Socket().then(function(new_socket) {
-        new_socket.alive = true;
-        new_socket.addEventListener("message", function(msg) {
-          new_socket.alive = true;
-        });
-
-        socket.onerror = undefined;
-        socket.onclose = undefined;
-
+        socket.removeListeners();
         socket.close();
+
         socket = new_socket;
+        setupSocket(socket);
         setStatus("");
       })
       .catch(function(e) {
@@ -98,6 +108,7 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
       socket.alive = false;
       var msg = { "type": "ping" };
       socket.send(JSON.stringify(msg));
+      console.log("Ping");
     }
   }, PING_INTERVAL);
 })
