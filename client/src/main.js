@@ -106,7 +106,7 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
         });
 
       } else {
-        setStatus("Connection lost: max retries reached.");
+        setStatus("Connection lost.");
         clearInterval(ping_interval);
         timer.stop();
       }
