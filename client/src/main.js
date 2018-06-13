@@ -7,6 +7,24 @@ const INTERVAL = 1000;
 const PING_INTERVAL = 30000;
 const MAX_RETRIES = 3;
 
+function attachButton(timer) {
+  var button = document.getElementById("button");
+  var inner = document.getElementById("inner-button");
+
+  button.onclick = function(e) {
+    e.preventDefault();
+
+    if(timer.running()) {
+      inner.setAttribute("fill", "grey");
+      timer.stop();
+
+    } else {
+      inner.setAttribute("fill", "red");
+      timer.start();
+    }
+  };
+};
+
 // Setup status display
 var status_box = document.getElementById("status-box");
 function setStatus(text) {
@@ -68,22 +86,7 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
 
       socket.send(JSON.stringify(msg));
     });
-
-  // Start and stop the timer based on the button
-  var button = document.getElementById("button");
-  var inner = document.getElementById("inner-button");
-  button.onclick = function(e) {
-    e.preventDefault();
-
-    if(timer.running()) {
-      inner.setAttribute("fill", "grey");
-      timer.stop();
-
-    } else {
-      inner.setAttribute("fill", "red");
-      timer.start();
-    }
-  };
+  attachButton(timer);
 
   // Setup ping
   var retries = 0;
