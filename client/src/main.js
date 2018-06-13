@@ -55,8 +55,6 @@ function attachButton(timer) {
 // Setup status display
 var status_box = document.getElementById("status-box");
 function setStatus(text) {
-  console.log(text);
-
   if(text.length > 0) {
     status_box.innerHTML = `<p>${text}</p>`;
   } else {
@@ -91,11 +89,12 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
   // Setup ping
   var retries = 0;
 
-  var ping_interval = setInterval(function() {
+  var pinger = new Timer(PING_INTERVAL, function() {
     if(socket.alive === false) {
       if(retries !== MAX_RETRIES) {
         retries += 1;
         setStatus("Attempting to reconnect...");
+
         Socket().then(function(new_socket) {
           socket.removeListeners();
           socket.close();
@@ -110,7 +109,7 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
 
       } else {
         setStatus("Connection lost.");
-        clearInterval(ping_interval);
+        pinger.stop();
         timer.stop();
       }
 
@@ -120,7 +119,8 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
       socket.send(JSON.stringify(msg));
       console.log("Ping");
     }
-  }, PING_INTERVAL);
+  });
+  pinger.start();
 })
 .catch(function(e) {
   setStatus("An error occured: "+e.message);
