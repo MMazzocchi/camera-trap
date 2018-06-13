@@ -1,14 +1,14 @@
 var cluster = require("cluster");
 var join = require("path").join;
 var fs = require("fs");
-var MOG2Comparer = require("./MOG2Comparer.js");
+var ComparerFactory = require("./ComparerFactory.js");
 var debug = require("debug")("camera-trap:worker-"+process.pid);
 
 if(cluster.isWorker) {
   debug("Started worker-"+process.pid);
 
   var id = process.pid;
-  var comparer = new MOG2Comparer();
+  var comparer = ComparerFactory.create();
 
   var queue = [];
   var dir = join(__dirname, "..", "..", "pics");
