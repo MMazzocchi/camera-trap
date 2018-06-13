@@ -23,7 +23,6 @@ function setupSocket(socket) {
   socket.alive = true;
   function handleMessage(msg) {
     socket.alive = true;
-    console.log("Pong: "+msg);
   };
   socket.addEventListener("message", handleMessage);
 
@@ -117,7 +116,6 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
       socket.alive = false;
       var msg = { "type": "ping" };
       socket.send(JSON.stringify(msg));
-      console.log("Ping");
     }
   });
   pinger.start();
