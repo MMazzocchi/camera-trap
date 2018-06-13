@@ -2,7 +2,6 @@ var Video = require("./Video.js");
 var Socket = require("./Socket.js");
 var Timer = require("./Timer.js");
 var fullscreen = require("./fullscreen.js");
-var NoSleep = require("../lib/NoSleep.min.js");
 
 const INTERVAL = 1000;
 const PING_INTERVAL = 30000;
@@ -22,8 +21,6 @@ function setStatus(text) {
 // Allow for fullscreen
 var body = document.getElementsByTagName("body")[0];
 fullscreen(body);
-
-var nosleep = new NoSleep();
 
 function setupSocket(socket) {
   function handleClose() {
