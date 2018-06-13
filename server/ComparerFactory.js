@@ -13,7 +13,7 @@ ComparerFactory.create = function() {
       process.env.threshold3);
 
   } else if(type === "mog2") {
-    return new MOG2Comparer();
+    return new MOG2Comparer(process.env.mog2_threshold);
 
   } else {
     throw new Error("Comparer type "+type+" was not recognized.");
