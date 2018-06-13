@@ -102,7 +102,7 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
           setStatus("");
         })
         .catch(function(e) {
-          setStatus("Reconnect failed: "+e.message);
+          setStatus("Reconnect "+retries+"/"+MAX_RETRIES+" failed: "+e.message);
         });
 
       } else {
