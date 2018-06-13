@@ -5,6 +5,7 @@ var fullscreen = require("./fullscreen.js");
 
 const INTERVAL = 1000;
 const PING_INTERVAL = 30000;
+const MAX_RETRIES = 3;
 
 // Setup status display
 var status_box = document.getElementById("status-box");
@@ -25,11 +26,13 @@ fullscreen(body);
 function setupSocket(socket) {
   function handleClose() {
     setStatus("Connection to server was closed.");
+    socket.alive = false;
   };
   socket.addEventListener("close", handleClose);
 
   function handleError(e) {
     setStatus("Connection to server errored: "+e);
+    socket.alive = false;
   };
   socket.addEventListener("error", handleError);
 
@@ -75,31 +78,38 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
     if(timer.running()) {
       inner.setAttribute("fill", "grey");
       timer.stop();
-      nosleep.disable();
 
     } else {
       inner.setAttribute("fill", "red");
       timer.start();
-      nosleep.enable();
     }
   };
 
   // Setup ping
+  var retries = 0;
+
   var ping_interval = setInterval(function() {
     if(socket.alive === false) {
-      setStatus("Lost connection to server. Attempting to reconnect...");
-      Socket().then(function(new_socket) {
-        socket.removeListeners();
-        socket.close();
+      if(retries !== MAX_RETRIES) {
+        retries += 1;
+        setStatus("Attempting to reconnect...");
+        Socket().then(function(new_socket) {
+          socket.removeListeners();
+          socket.close();
 
-        socket = new_socket;
-        setupSocket(socket);
-        setStatus("");
-      })
-      .catch(function(e) {
-        setStatus("Reconnect failed: "+e.message);
+          socket = new_socket;
+          setupSocket(socket);
+          setStatus("");
+        })
+        .catch(function(e) {
+          setStatus("Reconnect failed: "+e.message);
+        });
+
+      } else {
+        setStatus("Connection lost: max retries reached.");
         clearInterval(ping_interval);
-      });
+        timer.stop();
+      }
 
     } else {
       socket.alive = false;
