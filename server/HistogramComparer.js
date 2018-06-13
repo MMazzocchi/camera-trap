@@ -17,7 +17,7 @@ const PARAMS = [
   }
 ];
 
-var HistogramImageComparer = function(
+var HistogramComparer = function(
   threshold0, threshold1, threshold2, threshold3) {
 
   var that = new ImageComparer();
@@ -58,4 +58,4 @@ var HistogramImageComparer = function(
   return that;
 };
 
-module.exports = HistogramImageComparer;
+module.exports = HistogramComparer;
