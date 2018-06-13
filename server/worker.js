@@ -1,15 +1,19 @@
 var cluster = require("cluster");
 var join = require("path").join;
 var fs = require("fs");
-var ImageComparer = require("./ImageComparer.js");
+var HistogramImageComparer = require("./HistogramImageComparer.js");
 var debug = require("debug")("camera-trap:worker-"+process.pid);
 
 if(cluster.isWorker) {
   debug("Started worker-"+process.pid);
 
   var id = process.pid;
-  var comparer = new ImageComparer(process.env.threshold0,
-    process.env.threshold1, process.env.threshold2, process.env.threshold3);
+  var comparer = new HistogramImageComparer(
+    process.env.threshold0,
+    process.env.threshold1, 
+    process.env.threshold2,
+    process.env.threshold3);
+
   var queue = [];
   var dir = join(__dirname, "..", "..", "pics");
 
