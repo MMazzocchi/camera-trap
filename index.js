@@ -13,7 +13,7 @@ const config = {
   "threshold3": 0.15,
 
   // MOG2 Thresholds
-  "mog2_threshold": 20
+  "mog2_threshold": 30
 };
 
 new CameraTrapServer(config);
