@@ -13,8 +13,8 @@ if(cluster.isWorker) {
   var queue = [];
   var dir = join(__dirname, "..", "..", "pics");
 
-  function writeImage(img) {
-    var filename = join(dir, Date.now()+"_"+id+".jpg");
+  function writeImage(img, title) {
+    var filename = join(dir, title+".jpg");
     debug("Writing "+filename);
   
     var buffer = Buffer.from(img, "base64");
@@ -30,7 +30,7 @@ if(cluster.isWorker) {
     var different = comparer.handle(img);
   
     if(different) {
-      writeImage(img);
+      writeImage(img, Date.now()+"_"+id);
     }
   };
 
