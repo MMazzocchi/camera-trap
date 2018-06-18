@@ -4,6 +4,8 @@ var fs = require("fs");
 var ComparerFactory = require("./ComparerFactory.js");
 var debug = require("debug")("camera-trap:worker-"+process.pid);
 
+var cv = require("opencv4nodejs");
+
 if(cluster.isWorker) {
   debug("Started worker-"+process.pid);
 
@@ -31,7 +33,7 @@ if(cluster.isWorker) {
   
     if(result.different) {
       writeImage(img, Date.now()+"_"+id);
-      writeImage(result.mask, Date.now()+"_"+id+"_mask_"+result.value);
+      cv.imwrite(join(__dirname, "..", "..", "pics", Date.now()+"_"+id+"_mask_"+result.value+".jpg"), result.mask);
     }
   };
 
