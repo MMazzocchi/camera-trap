@@ -27,9 +27,9 @@ if(cluster.isWorker) {
   };
 
   function handleImage(img){
-    var different = comparer.handle(img);
+    var result = comparer.handle(img);
   
-    if(different) {
+    if(result.different) {
       writeImage(img, Date.now()+"_"+id);
     }
   };

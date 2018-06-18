@@ -19,7 +19,11 @@ var MOG2Comparer = function(threshold) {
     var value = mean.w;
     that.log(value);
 
-    return (value > threshold);
+    return {
+      "different": (value > threshold),
+      "value": value,
+      "mask": changed
+    };
   };
 
   return that;
