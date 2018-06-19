@@ -5,7 +5,6 @@ var fullscreen = require("./fullscreen.js");
 
 const INTERVAL = 1000;
 const PING_INTERVAL = 30000;
-const MAX_RETRIES = 3;
 
 // Bind events to a new socket
 function setupSocket(socket) {
@@ -93,28 +92,19 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
 
   var pinger = new Timer(PING_INTERVAL, function() {
     if(socket.alive === false) {
-      if(retries !== MAX_RETRIES) {
-        retries += 1;
-        setStatus("Attempting to reconnect...");
+      setStatus("Attempting to reconnect...");
 
-        Socket().then(function(new_socket) {
-          socket.removeListeners();
-          socket.close();
+      Socket().then(function(new_socket) {
+        socket.removeListeners();
+        socket.close();
 
-          socket = new_socket;
-          setupSocket(socket);
-          setStatus("");
-        })
-        .catch(function(e) {
-          setStatus("Reconnect "+retries+"/"+MAX_RETRIES+" failed: "+e.message);
-        });
-
-      } else {
-        setStatus("Connection lost.");
-        pinger.stop();
-        timer.stop();
-      }
-
+        socket = new_socket;
+        setupSocket(socket);
+        setStatus("");
+      })
+      .catch(function(e) {
+        setStatus("Reconnect #"+retries+" failed: "+e.message);
+      });
     } else {
       socket.alive = false;
       var msg = { "type": "ping" };
