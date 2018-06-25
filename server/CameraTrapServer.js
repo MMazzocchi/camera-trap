@@ -5,7 +5,6 @@ var app = express();
 var http = require("http").Server(app);
 var WebSocket = require("ws");
 var cluster = require("cluster");
-var ImageComparer = require("./ImageComparer.js");
 
 var debug = require("debug")("camera-trap");
 
