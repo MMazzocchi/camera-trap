@@ -7,7 +7,7 @@ function newId() {
   return new_id;
 };
 
-var MOG2Comparer = function(threshold) {
+var ImageComparer = function(threshold) {
   var that = {};
 
   // Fields
@@ -39,4 +39,4 @@ var MOG2Comparer = function(threshold) {
   return that;
 };
 
-module.exports = MOG2Comparer;
+module.exports = ImageComparer;

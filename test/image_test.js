@@ -1,7 +1,7 @@
 var assert = require("assert");
 var fs = require("fs");
 var join = require("path").join;
-var MOG2Comparer = require("../server/MOG2Comparer.js");
+var ImageComparer = require("../server/ImageComparer.js");
 
 const THRESHOLD = 35;
 const IMAGE_DIR = join(__dirname, "images");
@@ -16,7 +16,7 @@ function loadFileBase64(path) {
 
 describe("Image Comparison", function() {
   var files = fs.readdirSync(IMAGE_DIR);
-  var comparer = new MOG2Comparer(THRESHOLD);
+  var comparer = new ImageComparer(THRESHOLD);
 
   describe("First image", function() {
     it("should be classified as different", function() {
