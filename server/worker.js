@@ -1,7 +1,7 @@
 var cluster = require("cluster");
 var join = require("path").join;
 var fs = require("fs");
-var ComparerFactory = require("./ComparerFactory.js");
+var ImageComparer = require("./ImageComparer.js")
 var debug = require("debug")("camera-trap:worker-"+process.pid);
 
 var cv = require("opencv4nodejs");
@@ -10,7 +10,7 @@ if(cluster.isWorker) {
   debug("Started worker-"+process.pid);
 
   var id = process.pid;
-  var comparer = ComparerFactory.create();
+  var comparer = new ImageComparer(process.env.mog2_threshold);
 
   var queue = [];
   var dir = join(__dirname, "..", "..", "pics");
