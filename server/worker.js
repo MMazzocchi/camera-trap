@@ -10,7 +10,7 @@ if(cluster.isWorker) {
   debug("Started worker-"+process.pid);
 
   var id = process.pid;
-  var comparer = new ImageComparer(process.env.mog2_threshold);
+  var comparer = new ImageComparer(process.env.mean_changed_threshold);
 
   var queue = [];
   var dir = join(__dirname, "..", "..", "pics");
