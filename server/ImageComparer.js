@@ -7,6 +7,8 @@ function newId() {
   return new_id;
 };
 
+const BLUR_KERNEL = new cv.Size(5, 5);
+
 var ImageComparer = function(threshold) {
   var that = {};
 
@@ -21,7 +23,8 @@ var ImageComparer = function(threshold) {
     var buffer = Buffer.from(image_data, "base64");
     var mat = cv.imdecode(buffer, cv.IMREAD_COLOR);
     var gscale = mat.cvtColor(cv.COLOR_BGR2GRAY);
-    var equalized = gscale.equalizeHist();
+    var blurred = gscale.blur(BLUR_KERNEL);
+    var equalized = blurred.equalizeHist();
 
     var changed = subtractor.apply(equalized);
 

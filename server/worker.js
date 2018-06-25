@@ -33,7 +33,8 @@ if(cluster.isWorker) {
   
     if(result.different) {
       writeImage(img, Date.now()+"_"+id);
-      cv.imwrite(join(__dirname, "..", "..", "pics", Date.now()+"_"+id+"_mask_"+result.value+".jpg"), result.mask);
+      cv.imwrite(join(__dirname, "..", "..", "pics",
+        Date.now()+"_"+id+"_mask_"+result.value+".jpg"), result.mask);
     }
   };
 
