@@ -1,0 +1,46 @@
+var assert = require("assert");
+var fs = require("fs");
+var join = require("path").join;
+var MOG2Comparer = require("../server/MOG2Comparer.js");
+
+const THRESHOLD = 35;
+const IMAGE_DIR = join(__dirname, "images");
+
+function loadFileBase64(path) {
+  var data = fs.readFileSync(path);
+  var buffer = Buffer.from(data);
+  var base64 = buffer.toString("base64");
+
+  return base64;
+};
+
+describe("Image Comparison", function() {
+  var files = fs.readdirSync(IMAGE_DIR);
+  var comparer = new MOG2Comparer(THRESHOLD);
+
+  describe("First image", function() {
+    it("should be classified as different", function() {
+      var img = loadFileBase64(join(IMAGE_DIR, files[0]));
+      var result = comparer.handle(img);
+      assert.equal(result.different, true);
+    });
+  });
+
+  describe("Same images", function() {
+    it("should be classified as the same", function() {
+      for(var i=1; i<files.length - 1; i++) {
+        var img = loadFileBase64(join(IMAGE_DIR, files[i]));
+        var result = comparer.handle(img);
+        assert.equal(result.different, false);
+      }
+    });
+  });
+
+  describe("Last image", function() {
+    it("should be classified as different", function() {
+      var img = loadFileBase64(join(IMAGE_DIR, files[files.length-1]));
+      var result = comparer.handle(img);
+      assert.equal(result.different, true);
+    });
+  });
+});
