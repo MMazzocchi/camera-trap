@@ -4,6 +4,7 @@ var join = require("path").join;
 var ImageComparer = require("../server/ImageComparer.js");
 
 const THRESHOLD = 35;
+const KERNEL_SIZE = 5;
 const IMAGE_DIR = join(__dirname, "images");
 
 function loadFileBase64(path) {
@@ -16,7 +17,7 @@ function loadFileBase64(path) {
 
 describe("Image Comparison", function() {
   var files = fs.readdirSync(IMAGE_DIR);
-  var comparer = new ImageComparer(THRESHOLD);
+  var comparer = new ImageComparer(THRESHOLD, KERNEL_SIZE);
 
   describe("First image", function() {
     it("should be classified as different", function() {

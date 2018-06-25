@@ -7,14 +7,13 @@ function newId() {
   return new_id;
 };
 
-const BLUR_KERNEL = new cv.Size(5, 5);
-
-var ImageComparer = function(threshold) {
+var ImageComparer = function(threshold, kernel_size) {
   var that = {};
 
   // Fields
   var id = newId();
   var debug = require("debug")("camera-trap:comparer:"+id);
+  var blur_kernel = new cv.Size(kernel_size, kernel_size);
   var subtractor = new cv.BackgroundSubtractorMOG2(100, 16, true);
 
   that.handle = function(image_data) {
@@ -23,7 +22,7 @@ var ImageComparer = function(threshold) {
     var buffer = Buffer.from(image_data, "base64");
     var mat = cv.imdecode(buffer, cv.IMREAD_COLOR);
     var gscale = mat.cvtColor(cv.COLOR_BGR2GRAY);
-    var blurred = gscale.blur(BLUR_KERNEL);
+    var blurred = gscale.blur(blur_kernel);
     var equalized = blurred.equalizeHist();
 
     var changed = subtractor.apply(equalized);
