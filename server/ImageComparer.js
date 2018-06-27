@@ -12,9 +12,10 @@ var ImageComparer = function(threshold, kernel_size) {
 
   // Fields
   var id = newId();
+  var first_image = true;
   var debug = require("debug")("camera-trap:comparer:"+id);
   var blur_kernel = new cv.Size(kernel_size, kernel_size);
-  var subtractor = new cv.BackgroundSubtractorMOG2(100, 16, true);
+  var subtractor = new cv.BackgroundSubtractorMOG2(10, 16, false);
 
   that.handle = function(image_data) {
     debug("Processing an image.");
@@ -31,8 +32,15 @@ var ImageComparer = function(threshold, kernel_size) {
     var value = mean.w;
     debug(value);
 
+    var different = false;
+    if(!first_image) {
+      different = (value > threshold);
+    } else {
+      first_image = false;
+    }
+
     return {
-      "different": (value > threshold),
+      "different": different,
       "value": value,
       "mask": changed
     };

@@ -19,17 +19,9 @@ describe("Image Comparison", function() {
   var files = fs.readdirSync(IMAGE_DIR);
   var comparer = new ImageComparer(THRESHOLD, KERNEL_SIZE);
 
-  describe("First image", function() {
-    it("should be classified as different", function() {
-      var img = loadFileBase64(join(IMAGE_DIR, files[0]));
-      var result = comparer.handle(img);
-      assert.equal(result.different, true);
-    });
-  });
-
-  describe("Same images", function() {
+  describe("First images", function() {
     it("should be classified as the same", function() {
-      for(var i=1; i<files.length - 1; i++) {
+      for(var i=0; i<files.length - 1; i++) {
         var img = loadFileBase64(join(IMAGE_DIR, files[i]));
         var result = comparer.handle(img);
         assert.equal(result.different, false);
