@@ -13,10 +13,6 @@ const PING_INTERVAL = 30000;
 var CameraTrapServer = function(config) {
   var worker_path = join(__dirname, "worker.js");
 
-//  cluster.setupMaster({
-//    "exec": join(__dirname, "worker.js")
-//  }); 
-
   app.use("/", express.static(join(__dirname, "../client")));
   var wss = new WebSocket.Server({
     server: http
