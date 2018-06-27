@@ -59,7 +59,10 @@ var CameraTrapServer = function(config) {
       if(socket.alive === false) {
         debug("Cleaning up a dead socket.");
         socket.terminate();
-        socket.worker.kill(); 
+
+        if(!socker.worker.exitedAfterDisconnect) {
+          socket.worker.kill(); 
+        }
  
       } else {
         socket.alive = false;
