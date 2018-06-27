@@ -4,16 +4,18 @@ var express = require("express");
 var app = express();
 var http = require("http").Server(app);
 var WebSocket = require("ws");
-var cluster = require("cluster");
+var child_process = require("child_process");
 
 var debug = require("debug")("camera-trap");
 
 const PING_INTERVAL = 30000;
 
 var CameraTrapServer = function(config) {
-  cluster.setupMaster({
-    "exec": join(__dirname, "worker.js")
-  }); 
+  var worker_path = join(__dirname, "worker.js");
+
+//  cluster.setupMaster({
+//    "exec": join(__dirname, "worker.js")
+//  }); 
 
   app.use("/", express.static(join(__dirname, "../client")));
   var wss = new WebSocket.Server({
@@ -28,7 +30,7 @@ var CameraTrapServer = function(config) {
       socket.alive = true;
     });
 
-    var worker = cluster.fork(config);
+    var worker = child_process.fork(worker_path, {"env": config});
     socket.worker = worker;
 
     socket.on("message", function(json) {
