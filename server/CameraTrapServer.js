@@ -1,5 +1,7 @@
 var fs = require("fs");
-var join = require("path").join;
+var path = require("path");
+var join = path.join;
+var extname = path.extname;
 var express = require("express");
 var app = express();
 var http = require("http").Server(app);
@@ -14,6 +16,17 @@ var CameraTrapServer = function(config) {
   var worker_path = join(__dirname, "worker.js");
 
   app.use("/", express.static(join(__dirname, "../client")));
+  app.use("/picture", express.static(join(__dirname, "..", "..", "pics")));
+
+  app.get("/pictures", function(req, res) {
+    var files = fs.readdirSync(join(__dirname, "..", "..", "pics"));
+    var pics = files.filter(function(file) {
+      return (extname(file) === ".jpg");
+    });
+
+    res.send(JSON.stringify(pics));
+  });
+
   var wss = new WebSocket.Server({
     server: http
   });
