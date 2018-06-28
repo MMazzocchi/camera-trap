@@ -1,0 +1,18 @@
+img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+#nav-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+
+.nav-button {
+  padding: 10px;
+  margin: 0px;
+  width: 50%;
+  float: left;
+}
