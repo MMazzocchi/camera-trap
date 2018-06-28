@@ -13,10 +13,9 @@ var kernel_size = process.env.blur_kernel_size;
 var comparer = new ImageComparer(threshold, kernel_size);
 
 var queue = [];
-var dir = join(__dirname, "..", "..", "pics");
 
 function writeImage(img, title) {
-  var filename = join(dir, title+".jpg");
+  var filename = join(process.env.output_dir, title+".jpg");
   debug("Writing "+filename);
 
   var buffer = Buffer.from(img, "base64");

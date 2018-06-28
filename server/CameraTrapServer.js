@@ -15,11 +15,11 @@ const PING_INTERVAL = 30000;
 var CameraTrapServer = function(config) {
   var worker_path = join(__dirname, "worker.js");
 
-  app.use("/", express.static(join(__dirname, "../client")));
-  app.use("/picture", express.static(join(__dirname, "..", "..", "pics")));
+  app.use("/", express.static(join(__dirname, "..", "client")));
+  app.use("/picture", express.static(config.output_dir));
 
   app.get("/pictures", function(req, res) {
-    var files = fs.readdirSync(join(__dirname, "..", "..", "pics"));
+    var files = fs.readdirSync(config.output_dir);
     var pics = files.filter(function(file) {
       return (extname(file) === ".jpg");
     });
