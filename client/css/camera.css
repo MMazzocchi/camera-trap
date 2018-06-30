@@ -16,6 +16,14 @@
   height: 100%;
 }
 
+#menu {
+  background: white;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  right: 0;
+}
+
 svg > * {
   cursor: default;
   -webkit-user-select: none;

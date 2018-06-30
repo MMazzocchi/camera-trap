@@ -28,6 +28,25 @@
 
     <div id="status-box"></div>
 
+    <div id="menu">
+      <div>
+      <label for="rotation">Rotation: </label>
+        <select id="rotation">
+          <option value="0">0&deg;</option>
+          <option value="90">90&deg;</option>
+          <option value="180">180&deg;</option>
+          <option value="270">270&deg;</option>
+        </select>
+      </div>
+      <div>
+        <label for="zoom">Zoom: </label>
+        <input id="zoom" type="range" />
+      </div>
+      <div>
+        <button id="close">Close</button>
+      </div>
+    </div>
+
     <script src="/dist/camera.js"></script>
   </body>
 </html>
