@@ -30,6 +30,7 @@ var RecoverableSocket = async function() {
 
   function ping() {
    if(socket.alive === false) {
+      retries += 1;
       that.emit("status", "Attempting to reconnect...");
 
       Socket().then(function(new_socket) {
