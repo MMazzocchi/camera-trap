@@ -2,22 +2,9 @@ var Video = require("./Video.js");
 var RecoverableSocket = require("./RecoverableSocket.js");
 var Timer = require("./Timer.js");
 var fullscreen = require("./fullscreen.js");
+var Menu = require("./Menu.js");
 
 const INTERVAL = 1000;
-
-// Setup the menu
-var menu = document.getElementById("menu");
-var menu_btn = document.getElementById("menu-button");
-menu_btn.onclick = function(e) {
-  e.preventDefault();
-  menu.style.display = "block";
-};
-
-var close_btn = document.getElementById("close-button");
-close_btn.onclick = function(e) {
-  e.preventDefault();
-  menu.style.display = "none";
-};
 
 // Attach a timer to the button
 function attachButton(timer) {
@@ -59,6 +46,7 @@ Promise.all([RecoverableSocket(), Video(preview_el)]).then(function(values) {
   var video = values[1];
 
   socket.on("status", setStatus);
+  var menu = new Menu(socket);
 
   // Setup a timer to take snaps every INTERVAL milliseconds
   var timer = new Timer(INTERVAL,
