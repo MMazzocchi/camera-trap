@@ -1,10 +1,9 @@
 var Video = require("./Video.js");
-var Socket = require("./Socket.js");
+var RecoverableSocket = require("./RecoverableSocket.js");
 var Timer = require("./Timer.js");
 var fullscreen = require("./fullscreen.js");
 
 const INTERVAL = 1000;
-const PING_INTERVAL = 30000;
 
 // Setup the menu
 var menu = document.getElementById("menu");
@@ -18,33 +17,6 @@ var close_btn = document.getElementById("close-button");
 close_btn.onclick = function(e) {
   e.preventDefault();
   menu.style.display = "none";
-};
-
-// Bind events to a new socket
-function setupSocket(socket) {
-  function handleClose() {
-    setStatus("Connection to server was closed.");
-    socket.alive = false;
-  };
-  socket.addEventListener("close", handleClose);
-
-  function handleError(e) {
-    setStatus("Connection to server errored: "+e);
-    socket.alive = false;
-  };
-  socket.addEventListener("error", handleError);
-
-  socket.alive = true;
-  function handleMessage(msg) {
-    socket.alive = true;
-  };
-  socket.addEventListener("message", handleMessage);
-
-  socket.removeListeners = function() {
-    socket.removeEventListener("close", handleClose);
-    socket.removeEventListener("error", handleError);
-    socket.removeEventListener("message", handleMessage);
-  };
 };
 
 // Attach a timer to the button
@@ -82,11 +54,11 @@ fullscreen(body);
 
 // Setup the preview
 var preview_el = document.getElementById("preview");
-Promise.all([Socket(), Video(preview_el)]).then(function(values) {
+Promise.all([RecoverableSocket(), Video(preview_el)]).then(function(values) {
   var socket = values[0];
   var video = values[1];
 
-  setupSocket(socket);
+  socket.on("status", setStatus);
 
   // Setup a timer to take snaps every INTERVAL milliseconds
   var timer = new Timer(INTERVAL,
@@ -100,32 +72,6 @@ Promise.all([Socket(), Video(preview_el)]).then(function(values) {
       socket.send(JSON.stringify(msg));
     });
   attachButton(timer);
-
-  // Setup ping
-  var retries = 0;
-
-  var pinger = new Timer(PING_INTERVAL, function() {
-    if(socket.alive === false) {
-      setStatus("Attempting to reconnect...");
-
-      Socket().then(function(new_socket) {
-        socket.removeListeners();
-        socket.close();
-
-        socket = new_socket;
-        setupSocket(socket);
-        setStatus("");
-      })
-      .catch(function(e) {
-        setStatus("Reconnect #"+retries+" failed: "+e.message);
-      });
-    } else {
-      socket.alive = false;
-      var msg = { "type": "ping" };
-      socket.send(JSON.stringify(msg));
-    }
-  });
-  pinger.start();
 })
 .catch(function(e) {
   setStatus("An error occured: "+e.message);
