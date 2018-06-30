@@ -58,6 +58,8 @@ Promise.all([RecoverableSocket(), Video(preview_el)]).then(function(values) {
   var socket = values[0];
   var video = values[1];
 
+  socket.on("status", setStatus);
+
   // Setup a timer to take snaps every INTERVAL milliseconds
   var timer = new Timer(INTERVAL,
     function() {
