@@ -9,8 +9,10 @@ var files = $.getJSON("/pictures/")
   var n = files.length;
 
   function loadImage() {
-    var img = join("/picture", files[index]);
-    container.src = img;
+    if(files[inde] !== undefined) {
+      var img = join("/picture", files[index]);
+      container.src = img;
+    }
   };
   loadImage();
 
