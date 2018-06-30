@@ -9,7 +9,7 @@ var files = $.getJSON("/pictures/")
   var n = files.length;
 
   function loadImage() {
-    if(files[inde] !== undefined) {
+    if(files[index] !== undefined) {
       var img = join("/picture", files[index]);
       container.src = img;
     }
