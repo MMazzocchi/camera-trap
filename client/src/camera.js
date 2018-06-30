@@ -6,6 +6,20 @@ var fullscreen = require("./fullscreen.js");
 const INTERVAL = 1000;
 const PING_INTERVAL = 30000;
 
+// Setup the menu
+var menu = document.getElementById("menu");
+var menu_btn = document.getElementById("menu-button");
+menu_btn.onclick = function(e) {
+  e.preventDefault();
+  menu.style.display = "block";
+};
+
+var close_btn = document.getElementById("close-button");
+close_btn.onclick = function(e) {
+  e.preventDefault();
+  menu.style.display = "none";
+};
+
 // Bind events to a new socket
 function setupSocket(socket) {
   function handleClose() {
