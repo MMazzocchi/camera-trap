@@ -11,6 +11,7 @@ var RecoverableSocket = async function() {
   var socket = await Socket();
   var retries = 0;
   var pinger = new Timer(PING_INTERVAL, ping);
+  pinger.start();
 
   // Private methods
   function handleClose() {
@@ -29,7 +30,7 @@ var RecoverableSocket = async function() {
 
   function ping() {
    if(socket.alive === false) {
-      setStatus("Attempting to reconnect...");
+      that.emit("status", "Attempting to reconnect...");
 
       Socket().then(function(new_socket) {
         socket.removeListeners();
