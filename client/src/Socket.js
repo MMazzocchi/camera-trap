@@ -3,7 +3,7 @@ var Socket = function() {
 
     try {
       var url = window.location;
-      var socket = new WebSocket("ws://"+url.host);
+      var socket = new WebSocket("wss://"+url.host);
 
       // On an open event, resolve with the socket
       function handleOpen() {
