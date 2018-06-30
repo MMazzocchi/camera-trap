@@ -4,7 +4,7 @@ var join = path.join;
 var extname = path.extname;
 var express = require("express");
 var app = express();
-var http = require("http").Server(app);
+var https = require("https");
 var WebSocket = require("ws");
 var child_process = require("child_process");
 
@@ -13,6 +13,13 @@ var debug = require("debug")("camera-trap");
 const PING_INTERVAL = 30000;
 
 var CameraTrapServer = function(config) {
+  var https_options = {
+    key: config.key ? fs.readFileSync(config.key) : undefined,
+    cert: config.cert ? fs.readFileSync(config.cert) : undefined,
+    ca: config.ca ? fs.readFileSync(config.ca) : undefined
+  };
+  var server = https.createServer(https_options, app);
+
   var worker_path = join(__dirname, "worker.js");
 
   app.use("/", express.static(join(__dirname, "..", "client")));
@@ -30,7 +37,7 @@ var CameraTrapServer = function(config) {
   });
 
   var wss = new WebSocket.Server({
-    server: http
+    server: server 
   });
   
   wss.on("connection", function(socket, req) {
@@ -86,7 +93,7 @@ var CameraTrapServer = function(config) {
     });
   }, PING_INTERVAL);
   
-  http.listen(config.port, config.host, function() {
+  server.listen(config.port, config.host, function() {
     debug("Listening on "+config.host+":"+config.port);
   });
 };
